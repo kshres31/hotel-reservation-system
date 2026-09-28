@@ -1,4 +1,5 @@
 import argparse
+import math
 import sqlite3
 from datetime import date
 from pathlib import Path
@@ -10,7 +11,10 @@ def main(argv=None):
     available=subs.add_parser("available"); available.add_argument("check_in",type=date.fromisoformat); available.add_argument("check_out",type=date.fromisoformat)
     book=subs.add_parser("book"); book.add_argument("room",type=int); book.add_argument("guest"); book.add_argument("check_in",type=date.fromisoformat); book.add_argument("check_out",type=date.fromisoformat)
     cancel=subs.add_parser("cancel"); cancel.add_argument("booking_id",type=int); subs.add_parser("list")
-    args=parser.parse_args(argv); hotel=Hotel(args.database); hotel.initialize()
+    args=parser.parse_args(argv)
+    if args.command=="add-room" and not math.isfinite(args.price):
+        parser.error("price must be finite")
+    hotel=Hotel(args.database); hotel.initialize()
     try:
         if args.command=="add-room": hotel.add_room(args.number,args.kind,round(args.price*100)); print("Room added.")
         elif args.command=="available":
